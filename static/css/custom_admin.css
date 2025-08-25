@@ -1,0 +1,35 @@
+/* Change background color of the admin form */
+.form-row, .form-row .field-box {
+    background-color: #f0f0f0; /* Light gray background */
+    border-radius: 5px;
+}
+
+/* Change the label color */
+label {
+    color: #4CAF50; /* Green color for labels */
+}
+
+/* Change the input field color */
+input, select, textarea {
+    background-color: #ffffff;  /* White background for inputs */
+    border: 1px solid #ccc;  /* Light gray border */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Change the button color */
+button, .submit-row input[type="submit"] {
+    background-color: #4CAF50;  /* Green button */
+    color: rgb(245, 240, 240);  /* White text */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+}
+
+.custom-header{
+    color: orange;
+}
+
+button:hover, .submit-row input[type="submit"]:hover {
+    background-color: #45a049;  /* Darker green on hover */
+}

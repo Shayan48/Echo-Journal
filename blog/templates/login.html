@@ -1,0 +1,67 @@
+{% extends "basics.html" %}
+{% load static %}
+{% block title %}Login • Echo Journal{% endblock %}
+
+{% block body %}
+<style>
+  body {
+    background: #fdf6f0;
+  }
+  .auth-container {
+    max-width: 380px;
+    margin: 100px auto;
+    padding: 30px 25px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    color: #f39c12;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+  .form-control {
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    transition: border 0.3s;
+  }
+  .form-control:focus {
+    border-color: #f39c12;
+    outline: none;
+  }
+  .btn-primary {
+    width: 100%;
+    background-color: #f39c12;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 600;
+    transition: background 0.3s;
+  }
+  .btn-primary:hover {
+    background-color: #e68a00;
+  }
+  .text-center a {
+    color: #f39c12;
+    text-decoration: none;
+  }
+  .text-center a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="auth-container">
+  <h2>Login</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <input type="text" name="username" placeholder="Username or Email" class="form-control" required>
+    <input type="password" name="password" placeholder="Password" class="form-control" required>
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+  <p class="text-center mt-3">Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "basics.html" %}
+{% block title %}Add Blog • Echo Journal{% endblock %}
+
+{% block body %}
+<style>
+    .blog-card {
+        max-width: 700px;
+        margin: auto;
+    }
+    .blog-form input,
+    .blog-form select,
+    .blog-form textarea {
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(236, 108, 3, 0.97);
+        padding: 10px;
+    }
+    .blog-form label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+    .btn-custom {
+        background-color: #ee6c15ff;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+    .btn-custom:hover {
+        background-color: #343a40;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="card blog-card shadow-lg rounded-4 border-0">
+        <div class="card-header bg-dark text-white text-center py-3 rounded-top-4">
+            <h2 class="mb-0">Create a New Blog</h2>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data" class="row g-4 blog-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    <div class="col-12">
+                        <label class="form-label">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for e in field.errors %}
+                            <div class="text-danger small">{{ e }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <div class="col-12 text-center">
+                    <button class="btn btn-custom px-4 py-2 shadow-sm">Publish Blog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

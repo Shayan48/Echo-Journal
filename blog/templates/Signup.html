@@ -1,0 +1,80 @@
+{% extends "basics.html" %}
+{% load static %}
+{% block title %}Sign Up • Echo Journal{% endblock %}
+
+{% block body %}
+<style>
+  body {
+    background: #fdf6f0;
+  }
+  .auth-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px 25px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    color: #f39c12;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+  .form-control {
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    transition: border 0.3s;
+  }
+  .form-control:focus {
+    border-color: #f39c12;
+    outline: none;
+  }
+  .btn-primary {
+    width: 100%;
+    background-color: #f39c12;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 600;
+    transition: background 0.3s;
+  }
+  .btn-primary:hover {
+    background-color: #e68a00;
+  }
+  .text-center a {
+    color: #f39c12;
+    text-decoration: none;
+  }
+  .text-center a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="auth-container">
+  <h2>Sign Up</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.username.errors }}
+    <input type="text" name="username" placeholder="Username" class="form-control" required>
+
+    {{ form.full_name.errors }}
+    <input type="text" name="full_name" placeholder="Full Name" class="form-control" required>
+
+    {{ form.email.errors }}
+    <input type="email" name="email" placeholder="Email" class="form-control" required>
+
+    {{ form.password1.errors }}
+    <input type="password" name="password" placeholder="Password" class="form-control" required>
+
+    {{ form.password2.errors }}
+    <input type="password" name="confirm_password" placeholder="Confirm Password" class="form-control" required>
+
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+  </form>
+  <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+</div>
+{% endblock %}

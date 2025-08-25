@@ -1,0 +1,165 @@
+{% extends "basics.html" %}
+{% load static %}
+{% block title %}Blogs • Echo Journal{% endblock %}
+
+{% block body %}
+<style>
+  /* Blog Section Styling */
+  .blog-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fff;
+  }
+
+  .blog-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Fix image size inside cards */
+  .blog-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    transition: transform 0.4s ease;
+  }
+
+  .blog-card img:hover {
+    transform: scale(1.05);
+  }
+
+  /* Card Body Styling */
+  .blog-card .card-body {
+    padding: 1rem 1.2rem;
+  }
+
+  /* Title Styling */
+  .blog-card h2 a {
+    color: #212529;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .blog-card h2 a:hover {
+    color: #f39c12; /* Theme color hover effect */
+  }
+
+  /* Badge Styling */
+  .badge.text-bg-warning {
+    background: #ffc107;
+    font-size: 0.7rem;
+    padding: 6px 10px;
+  }
+
+  /* Category Filter Styling */
+  .category-filter .btn {
+    font-weight: 500;
+    border-radius: 50px;
+    padding: 6px 14px;
+    transition: all 0.3s ease;
+  }
+
+  .category-filter .btn-dark {
+    background-color: #212529;
+    border: none;
+  }
+
+  .category-filter .btn-outline-dark:hover {
+    background-color: #212529;
+    color: #fff;
+  }
+
+  /* Pagination Styling */
+  .pagination .page-link {
+    border-radius: 8px;
+    color: #212529;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #f39c12;
+    color: #fff;
+  }
+
+  /* Page Title */
+  .display-6 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+  }
+</style>
+
+<!-- Page Title -->
+<div class="mb-4 text-center">
+  <h1 class="display-6 fw-bold">
+    <span class="text-warning">ECHO</span> <span class="text-dark">JOURNAL</span>
+  </h1>
+  <p class="text-muted">Discover stories, ideas, and insights from our authors</p>
+</div>
+
+<!-- Category Filter -->
+<div class="d-flex align-items-center gap-2 flex-wrap mb-4 category-filter">
+  <h2><span class="badge text-bg-dark">Category Filter</span></h2>
+  <a class="btn btn-sm {% if not active_category %}btn-dark{% else %}btn-outline-dark{% endif %}"
+     href="{% url 'blogs:blog_list' %}">All</a>
+  {% for cat in categories %}
+    <a class="btn btn-sm {% if active_category and active_category.slug == cat.slug %}btn-dark{% else %}btn-outline-dark{% endif %}"
+       href="{% url 'blogs:category' cat.slug %}">{{ cat.name }}</a>
+  {% endfor %}
+</div>
+
+<!-- Blog Grid -->
+{% if page_obj and page_obj.object_list %}
+  <div class="row g-4">
+    {% for post in page_obj.object_list %}
+      <div class="col-12 col-sm-6 col-lg-4">
+        <article class="card h-100 shadow-sm blog-card">
+          {% if post.image %}
+            <a href="{% url 'blogs:detail' post.id %}">
+              <img src="{{ post.image.url }}" alt="{{ post.title }}" class="card-img-top">
+            </a>
+          {% endif %}
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="badge rounded-pill text-bg-warning text-uppercase">{{ post.category.name }}</span>
+              <span class="text-muted small">{{ post.created_at|date:"M d, Y" }}</span>
+            </div>
+            <h2 class="h5 mb-2">
+              <a href="{% url 'blogs:detail' post.id %}">
+                {{ post.title }}
+              </a>
+            </h2>
+            <p class="text-muted mb-0">{{ post.excerpt|default:post.content|striptags|truncatewords:24 }}</p>
+          </div>
+        </article>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  <nav class="mt-5">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Prev</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Prev</span></li>
+      {% endif %}
+
+      <li class="page-item disabled"><span class="page-link">
+        Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      </span></li>
+
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% else %}
+  <div class="text-center py-5 text-muted">No blogs found.</div>
+{% endif %}
+{% endblock %}
