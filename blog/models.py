@@ -27,10 +27,11 @@ class Category(models.Model):
 # BLOG MODEL
 class Blog(models.Model):
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=250, unique=True, blank=True)
+    slug = models.SlugField(max_length=250, blank=True, unique=True)  # Add unique=True
     excerpt = models.TextField(max_length=300, blank=True, help_text="Optional short summary for list view")
     content = models.TextField()
     image = models.ImageField(upload_to='blogs/', blank=True, null=True)
+    is_approved = models.BooleanField(default=False)  # Approval system
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="blogs")
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="blogs")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,10 +41,17 @@ class Blog(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Blog.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
         if not self.excerpt:
-            # Auto-generate excerpt from content (first 30 words)
             self.excerpt = " ".join(self.content.split()[:30]) + "..."
+
         super().save(*args, **kwargs)
 
     def __str__(self):

@@ -2,38 +2,52 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
 from .models import Blog, Category
 from .forms import BlogForm
 
+# HOME PAGE (Default Index)
+# def index(request):
+#     blogs = Blog.objects.filter(is_approved=True).select_related('category', 'author')[:10]  # Only approved blogs
+#     categories = Category.objects.all()
+#     return render(request, 'index.html', {
+#         'blogs': blogs,
+#         'categories': categories
+#     })
 
-# HOME PAGE
+# HOMEPAGE (with latest blogs)
 def homepage(request):
-    latest_blogs = Blog.objects.select_related('category').order_by('-created_at')[:6]
+    blogs = Blog.objects.filter(is_approved=True).select_related('category', 'author').order_by('-created_at')[:6]
     categories = Category.objects.all()
     return render(request, 'index.html', {
-        'latest_blogs': latest_blogs,
+        'blogs': blogs,
         'categories': categories,
     })
 
-# BLOG LIST VIEW (with category filter + search + pagination)
-def blog_list(request, category_slug=None):
-    categories = Category.objects.all()
-    active_category = None
-    blogs = Blog.objects.select_related('category', 'author').order_by('-created_at')
 
-    # Category filter
+# BLOG LIST VIEW (with category filter + search + pagination)
+
+def blog_list(request, category_slug=None):
+    # Fetch all categories (cache karne par aur optimize hoga)
+    categories = Category.objects.all()
+    
+    # Base Query (only approved blogs)
+    blogs = Blog.objects.select_related('category', 'author').filter(is_approved=True).order_by('-created_at')
+
+    # Category filter (if slug exists)
+    active_category = None
     if category_slug:
         active_category = get_object_or_404(Category, slug=category_slug)
         blogs = blogs.filter(category=active_category)
 
-    # Search filter
-    query = request.GET.get('q')
+    # Search filter (case-insensitive search on title)
+    query = request.GET.get('q', '').strip()
     if query:
         blogs = blogs.filter(title__icontains=query)
 
-    # Pagination
-    paginator = Paginator(blogs, 6)  # 6 blogs per page
+    # Pagination (6 blogs per page)
+    paginator = Paginator(blogs, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -41,44 +55,44 @@ def blog_list(request, category_slug=None):
         'categories': categories,
         'active_category': active_category,
         'page_obj': page_obj,
+        'query': query,  # search ko template me preserve karne ke liye
     })
 
-# def blogs_by_category(request, slug):
-#     category = get_object_or_404(Category, slug=slug)
-#     posts = Blog.objects.filter(category=category)
-#     return render(request, "blogs/blog_list.html", {
-#         "categories": Category.objects.all(),
-#         "active_category": category,
-#         "page_obj": posts
-#     })
+
 
 # BLOG DETAIL VIEW
-from django.shortcuts import render, get_object_or_404
-from .models import Blog
+
 
 def blog_detail(request, id):
     blog = get_object_or_404(Blog, id=id)
     return render(request, 'blogs/blog_details.html', {'post': blog})
 
 
-# ADD BLOG VIEW (Only for logged-in users)
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import BlogForm
 
+@staff_member_required
+def admin_dashboard(request):
+    pending_blogs = Blog.objects.filter(is_approved=False)
+    approved_blogs = Blog.objects.filter(is_approved=True)
+    return render(request, 'blogs/admin_dashboard.html', {
+        'pending_blogs': pending_blogs,
+        'approved_blogs': approved_blogs
+    })
+
+# DASHBOARD VIEW
 @login_required
 def add_blog(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = BlogForm(request.POST, request.FILES)
         if form.is_valid():
-            blog = form.save(commit=False)  # Don't save yet
-            blog.author = request.user      # Assign current logged-in user as author
-            blog.save()                     # Now save
+            blog = form.save(commit=False)
+            blog.author = request.user
+            blog.is_approved = False  # Needs admin approval
+            blog.save()
             return redirect('blogs:blog_list')
+  # Show pending status
     else:
         form = BlogForm()
     return render(request, 'blogs/add_blog.html', {'form': form})
-
 
 
 # blog/views.py

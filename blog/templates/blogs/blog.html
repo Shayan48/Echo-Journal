@@ -1,4 +1,4 @@
-{% extends "basics.html." %}
+{% extends "basics.html" %}
 {% load static %}
 {% block body %}
 
@@ -6,133 +6,47 @@
   <div class="container">
     <div class="heading_container">
       <h2>
-        <b style="color:  #f07b26;">ECHO</b> <b>JOURNAL</b>
+        <b style="color: #f07b26;">ECHO</b> <b>JOURNAL</b>
       </h2>
-
     </div>
-    <div class="carousel-wrap ">
+    
+    <div class="carousel-wrap">
       <div class="filter_box">
-        <h6>
-          Category filter
-        </h6>
+        <h6>Category filter</h6>
         <nav class="owl-filter-bar">
           <a href="#" class="item active" data-owl-filter="*">All</a>
-          <a href="#" class="item" data-owl-filter=".painting">Technology</a>
-          <a href="#" class="item" data-owl-filter=".reconstruction">Fasion </a>
-          <a href="#" class="item" data-owl-filter=".repair">Travel </a>
-          <a href="#" class="item" data-owl-filter=".residential">Health </a>
-          <a href="#" class="item" data-owl-filter=".styling">Styling </a>
+          {% for category in categories %}
+            <a href="#" class="item" data-owl-filter=".{{ category.slug }}">{{ category.name }}</a>
+          {% endfor %}
         </nav>
       </div>
 
       <div class="owl-carousel project_carousel">
-        <div class="item painting">
+        {% for blog in blogs %}
+        <div class="item {{ blog.category.slug }}">
           <div class="box">
             <div class="img-box">
-              <img src="{% static 'images/project1.jpg' %}" alt="" />
-              <a href="" class="pin_link">
+              {% if blog.image %}
+                <img src="{{ blog.image.url }}" alt="{{ blog.title }}">
+              {% else %}
+                <img src="{% static 'images/default-blog.jpg' %}" alt="{{ blog.title }}">
+              {% endif %}
+              <a href="{% url 'blogs:detail' blog.slug %}" class="pin_link">
                 <i class="fa fa-link" aria-hidden="true"></i>
               </a>
             </div>
             <div class="detail-box">
-              <h5>
-                Artificial Intelligence
-              </h5>
-              <p>
-                Artificial Intelligence (AI) is no longer just a concept from sci-fi movies; it’s an integral part
-                of our daily lives. From voice assistants like Siri and Alexa to self-driving cars and advanced
-                medical diagnostics, AI is revolutionizing the way we live and work.
-                Machine learning (ML) and deep learning (DL) are subsets of AI that allow computers to improve over
-                time without being explicitly programmed.
-              </p>
+              <h5>{{ blog.title }}</h5>
+              <p>{{ blog.excerpt|truncatewords:25 }}</p>
             </div>
           </div>
         </div>
-        <div class="item reconstruction">
-          <div class="box">
-            <div class="img-box">
-              <img src="{% static 'images/project2.jpg' %}" alt="" />
-              <a href="" class="pin_link">
-                <i class="fa fa-link" aria-hidden="true"></i>
-              </a>
-            </div>
-            <div class="detail-box">
-              <h5>
-                The Art of Dressing
-              </h5>
-              <p>
-                Dressing is more than just putting on clothes; it is a way of expressing oneself, boosting
-                confidence, and making a statement. Whether you're dressing for a formal event, a casual outing, or
-                simply lounging at home, the right outfit can make a significant difference. Let's explore the
-                essentials of dressing well and how you can develop your unique style.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="item repair">
-          <div class="box">
-            <div class="img-box">
-              <img src="{% static 'images/project3.jpg' %}" alt="" />
-              <a href="" class="pin_link">
-                <i class="fa fa-link" aria-hidden="true"></i>
-              </a>
-            </div>
-            <div class="detail-box">
-              <h5>
-                The Joy of Traveling
-              </h5>
-              <p>
-                Traveling is more than just visiting new places; it is a journey of discovery, adventure, and
-                personal growth. Whether you are exploring a new city, immersing yourself in a different culture, or
-                simply taking a break from routine, traveling enriches your life in countless ways. Let’s explore
-                the magic of traveling and how you can make the most of your journeys.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="item residential">
-          <div class="box">
-            <div class="img-box">
-              <img src="{% static 'images/project1.jpg' %}" alt="" />
-              <a href="" class="pin_link">
-                <i class="fa fa-link" aria-hidden="true"></i>
-              </a>
-            </div>
-            <div class="detail-box">
-              <h5>
-                Interior work
-              </h5>
-              <p>
-                alteration in some form, by injected humour, or randomised words which don't look even slightly
-                believable. If you are going to use
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="item styling">
-          <div class="box">
-            <div class="img-box">
-              <img src="{% static 'images/project1.jpg' %}" alt="" />
-              <a href="" class="pin_link">
-                <i class="fa fa-link" aria-hidden="true"></i>
-              </a>
-            </div>
-            <div class="detail-box">
-              <h5>
-                Interior work
-              </h5>
-              <p>
-                alteration in some form, by injected humour, or randomised words which don't look even slightly
-                believable. If you are going to use
-              </p>
-            </div>
-          </div>
-        </div>
+        {% empty %}
+        <p>No blogs available.</p>
+        {% endfor %}
       </div>
     </div>
   </div>
 </section>
 
-
 {% endblock body %}
-
